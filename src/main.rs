@@ -7,16 +7,28 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
 use rand::Rng;
+use rand::rngs::ThreadRng;
 use crate::synths::SineSynth;
 
-fn audio_callback(data: &mut [f32], _: &cpal::OutputCallbackInfo) {
-    let mut rng = rand::thread_rng();
-    for sample in data.chunks_mut(2) {
-        let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
-        //let x: [f32, 2] = []
-        sample.copy_from_slice(&x);
+struct AudioCallback {
+}
+impl AudioCallback {
+    fn new() -> AudioCallback {
+        AudioCallback {
+        }
+    }
+    fn audio_callback(data: &mut [f32], _: &cpal::OutputCallbackInfo) {
+        println!("asd");
+        let mut rng = rand::thread_rng();
+        for sample in data.chunks_mut(2) {
+            let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
+            //let x: [f32, 2] = []
+            sample.copy_from_slice(&x);
+        }
     }
 }
+
+
 
 fn main() {
     let host = cpal::default_host();
@@ -24,24 +36,14 @@ fn main() {
     let device = host.default_output_device().expect("No output device available");
     let config = device.default_output_config().unwrap().config();
     let sample_rate = config.sample_rate;
-    /*let stream = device.build_output_stream(
-        &config,
-        move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
-            let mut rng = rand::thread_rng();
-            for sample in data.chunks_mut(2) {
-                let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
-                sample.copy_from_slice(&x);
-            }
-        },
-        move |err| {
-            // react to errors here.
-        },
-        None // None=blocking, Some(Duration)=timeout
-    ).unwrap();*/
 
+    let mut ac = AudioCallback::new();
+    /*let x = move |data, info| {
+        //ac.audio_callback(data, info);
+    };*/
     let stream = device.build_output_stream(
         &config,
-        audio_callback,
+        AudioCallback::audio_callback,
         move |err| {  // react to errors here.
 
         },
