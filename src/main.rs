@@ -6,6 +6,7 @@ extern crate num_complex;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
+use cpal::OutputCallbackInfo;
 use rand::Rng;
 use rand::rngs::ThreadRng;
 use crate::synths::SineSynth;
@@ -17,7 +18,7 @@ impl AudioCallback {
         AudioCallback {
         }
     }
-    fn audio_callback(data: &mut [f32], _: &cpal::OutputCallbackInfo) {
+    fn audio_callback(&self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         println!("asd");
         let mut rng = rand::thread_rng();
         for sample in data.chunks_mut(2) {
@@ -38,12 +39,13 @@ fn main() {
     let sample_rate = config.sample_rate;
 
     let mut ac = AudioCallback::new();
-    /*let x = move |data, info| {
+    let x = move |data: &mut [f32], info: &OutputCallbackInfo| {
         //ac.audio_callback(data, info);
-    };*/
+        ac.audio_callback(data, info);
+    };
     let stream = device.build_output_stream(
         &config,
-        AudioCallback::audio_callback,
+        x,
         move |err| {  // react to errors here.
 
         },
