@@ -12,17 +12,20 @@ use rand::rngs::ThreadRng;
 use crate::synths::SineSynth;
 
 struct AudioCallback {
+    sine: SineSynth
 }
 impl AudioCallback {
-    fn new() -> AudioCallback {
+    fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
+            sine: SineSynth::new(sample_rate as i32)
         }
     }
-    fn audio_callback(&self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
-        println!("asd");
+    fn audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let mut rng = rand::thread_rng();
         for sample in data.chunks_mut(2) {
-            let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
+            let s = self.sine.get_sample();
+            //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
+            let x: [f32; 2] = [s, s];
             //let x: [f32, 2] = []
             sample.copy_from_slice(&x);
         }
@@ -38,7 +41,7 @@ fn main() {
     let config = device.default_output_config().unwrap().config();
     let sample_rate = config.sample_rate;
 
-    let mut ac = AudioCallback::new();
+    let mut ac = AudioCallback::new(sample_rate.0 as usize);
     let x = move |data: &mut [f32], info: &OutputCallbackInfo| {
         //ac.audio_callback(data, info);
         ac.audio_callback(data, info);
@@ -54,7 +57,7 @@ fn main() {
 
     stream.play().expect("Failed to play stream");
 
-    sleep(Duration::from_secs(1));
+    sleep(Duration::from_secs(10));
 
     stream.pause().expect("Failed to pause stream");
 }

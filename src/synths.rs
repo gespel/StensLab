@@ -11,7 +11,7 @@ impl SineSynth {
         }
     }
     pub fn get_sample(&mut self) -> f32 {
-        self.phase += (220.0_f32 / self.sample_rate as f32) * 2.0 * std::f32::consts::PI;
+        self.phase += (440.0_f32 / self.sample_rate as f32) * 2.0 * std::f32::consts::PI;
         return self.phase.sin();
     }
 }
