@@ -1,4 +1,5 @@
 mod synths;
+mod rack;
 
 extern crate cpal;
 extern crate num_complex;
@@ -9,7 +10,7 @@ use std::time::Duration;
 use cpal::OutputCallbackInfo;
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::synths::SineSynth;
+use crate::synths::{SineSynth, Synth};
 
 struct AudioCallback {
     sine: SineSynth
@@ -17,7 +18,7 @@ struct AudioCallback {
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            sine: SineSynth::new(sample_rate as i32)
+            sine: SineSynth::new(sample_rate as usize)
         }
     }
     fn audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
