@@ -7,7 +7,7 @@ extern crate num_complex;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
-use cpal::OutputCallbackInfo;
+use cpal::{InputCallbackInfo, OutputCallbackInfo};
 use rand::Rng;
 use rand::rngs::ThreadRng;
 use crate::synths::{SineSynth, Synth};
@@ -21,7 +21,7 @@ impl AudioCallback {
             sine: SineSynth::new(sample_rate as usize)
         }
     }
-    fn audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
+    fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let mut rng = rand::thread_rng();
         for sample in data.chunks_mut(2) {
             let s = self.sine.get_sample();
@@ -31,6 +31,13 @@ impl AudioCallback {
             sample.copy_from_slice(&x);
         }
     }
+    fn in_audio_callback(&mut self, data: &[f32], _: &cpal::InputCallbackInfo) {
+        /*let mut datacp: &mut [f32] = data.clone();
+        for sample in datacp.chunks_mut(1) {
+            println!("{:?}", sample);
+        }*/
+    }
+
 }
 
 
@@ -42,12 +49,27 @@ fn main() {
     let config = device.default_output_config().unwrap().config();
     let sample_rate = config.sample_rate;
 
-    let mut ac = AudioCallback::new(sample_rate.0 as usize);
+    let mut ac_in = AudioCallback::new(sample_rate.0 as usize);
+    let y = move |data: &[f32], info: &InputCallbackInfo| {
+        ac_in.in_audio_callback(data, info);
+    };
+
+
+    let mut ac_out = AudioCallback::new(sample_rate.0 as usize);
     let x = move |data: &mut [f32], info: &OutputCallbackInfo| {
         //ac.audio_callback(data, info);
-        ac.audio_callback(data, info);
+        ac_out.out_audio_callback(data, info);
     };
-    let stream = device.build_output_stream(
+
+    let in_stream = device.build_input_stream(
+        &config,
+        y,
+        move |err| {
+
+        },
+        None
+    ).unwrap();
+    let out_stream = device.build_output_stream(
         &config,
         x,
         move |err| {  // react to errors here.
@@ -56,9 +78,12 @@ fn main() {
         None // None=blocking, Some(Duration)=timeout
     ).unwrap();
 
-    stream.play().expect("Failed to play stream");
+
+
+
+    out_stream.play().expect("Failed to play stream");
 
     sleep(Duration::from_secs(10));
 
-    stream.pause().expect("Failed to pause stream");
+    out_stream.pause().expect("Failed to pause stream");
 }
