@@ -32,6 +32,9 @@ impl AudioCallback {
         }
     }
     fn in_audio_callback(&mut self, data: &[f32], _: &cpal::InputCallbackInfo) {
+        for sample in data {
+            println!("{:?}", sample);
+        }
         /*let mut datacp: &mut [f32] = data.clone();
         for sample in datacp.chunks_mut(1) {
             println!("{:?}", sample);

@@ -48,8 +48,6 @@ impl SquareSynth {
 }
 
 impl Synth for SquareSynth {
-
-
     fn get_sample(&mut self) -> f32 {
         self.phase += (self.freq / self.sample_rate as f32) * 2.0 * std::f32::consts::PI;
         let x = self.phase.sin();
