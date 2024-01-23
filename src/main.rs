@@ -10,19 +10,20 @@ use std::time::Duration;
 use cpal::{InputCallbackInfo, OutputCallbackInfo};
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::synths::{SineSynth, Synth};
+use crate::synths::{SawtoothSynth, SineSynth, Synth};
 
 struct AudioCallback {
-    sine: SineSynth
+    sine: SawtoothSynth
 }
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            sine: SineSynth::new(sample_rate as usize)
+            sine: SawtoothSynth::new(sample_rate as usize)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let mut rng = rand::thread_rng();
+        self.sine.set_frequency(440_f32);
         for sample in data.chunks_mut(2) {
             let s = self.sine.get_sample();
             //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
@@ -32,9 +33,9 @@ impl AudioCallback {
         }
     }
     fn in_audio_callback(&mut self, data: &[f32], _: &cpal::InputCallbackInfo) {
-        for sample in data {
+        /*for sample in data {
             println!("{:?}", sample);
-        }
+        }*/
         /*let mut datacp: &mut [f32] = data.clone();
         for sample in datacp.chunks_mut(1) {
             println!("{:?}", sample);
@@ -64,14 +65,14 @@ fn main() {
         ac_out.out_audio_callback(data, info);
     };
 
-    let in_stream = device.build_input_stream(
+    /*let in_stream = device.build_input_stream(
         &config,
         y,
         move |err| {
-
+            println!("Error while opening inputstream!");
         },
         None
-    ).unwrap();
+    ).unwrap();*/
     let out_stream = device.build_output_stream(
         &config,
         x,

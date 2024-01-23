@@ -1,3 +1,5 @@
+use cpal::SampleRate;
+
 pub trait Synth {
     fn get_sample(&mut self) -> f32;
     fn set_frequency(&mut self, freq: f32);
@@ -6,7 +8,8 @@ pub trait Synth {
 pub struct SineSynth {
     phase: f32,
     sample_rate: usize,
-    freq: f32
+    freq: f32,
+    samples_per_phase: usize
 }
 
 impl SineSynth {
@@ -14,7 +17,8 @@ impl SineSynth {
         SineSynth {
             phase: 0.0_f32,
             sample_rate,
-            freq: 220_f32
+            freq: 220_f32,
+            samples_per_phase: sample_rate/220_f32 as usize
         }
     }
 }
@@ -64,5 +68,35 @@ impl Synth for SquareSynth {
 
     fn set_frequency(&mut self, freq: f32) {
         self.freq = freq;
+    }
+}
+
+pub struct SawtoothSynth {
+    sample: f32,
+    sample_rate: usize,
+    freq: f32
+}
+
+impl Synth for SawtoothSynth {
+    fn get_sample(&mut self) -> f32 {
+        self.sample += self.freq/self.sample_rate as f32;
+        if(self.sample > 1f32) {
+            self.sample = -1f32;
+        }
+        return self.sample*0.5;
+    }
+
+    fn set_frequency(&mut self, freq: f32) {
+        self.freq = freq;
+    }
+}
+
+impl SawtoothSynth {
+    pub(crate) fn new(sample_rate: usize) -> SawtoothSynth {
+        SawtoothSynth {
+            sample: 0.0,
+            sample_rate,
+            freq: 440.0_f32,
+        }
     }
 }
