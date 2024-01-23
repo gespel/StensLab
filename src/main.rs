@@ -8,9 +8,9 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
 use cpal::{InputCallbackInfo, OutputCallbackInfo};
-use rand::Rng;
-use rand::rngs::ThreadRng;
-use crate::synths::{SawtoothSynth, SineSynth, Synth};
+
+
+use crate::synths::{SawtoothSynth, Synth};
 
 struct AudioCallback {
     sine: SawtoothSynth
@@ -18,11 +18,11 @@ struct AudioCallback {
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            sine: SawtoothSynth::new(sample_rate as usize)
+            sine: SawtoothSynth::new(sample_rate)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
-        let mut rng = rand::thread_rng();
+        let _rng = rand::thread_rng();
         self.sine.set_frequency(440_f32);
         for sample in data.chunks_mut(2) {
             let s = self.sine.get_sample();
@@ -32,7 +32,7 @@ impl AudioCallback {
             sample.copy_from_slice(&x);
         }
     }
-    fn in_audio_callback(&mut self, data: &[f32], _: &cpal::InputCallbackInfo) {
+    fn in_audio_callback(&mut self, _data: &[f32], _: &cpal::InputCallbackInfo) {
         /*for sample in data {
             println!("{:?}", sample);
         }*/
@@ -54,7 +54,7 @@ fn main() {
     let sample_rate = config.sample_rate;
 
     let mut ac_in = AudioCallback::new(sample_rate.0 as usize);
-    let y = move |data: &[f32], info: &InputCallbackInfo| {
+    let _y = move |data: &[f32], info: &InputCallbackInfo| {
         ac_in.in_audio_callback(data, info);
     };
 
@@ -76,7 +76,7 @@ fn main() {
     let out_stream = device.build_output_stream(
         &config,
         x,
-        move |err| {  // react to errors here.
+        move |_err| {  // react to errors here.
 
         },
         None // None=blocking, Some(Duration)=timeout
