@@ -1,5 +1,6 @@
 mod synths;
 mod rack;
+mod script_language;
 
 extern crate cpal;
 extern crate num_complex;
@@ -8,6 +9,7 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
 use cpal::{InputCallbackInfo, OutputCallbackInfo};
+use crate::script_language::ScriptParser;
 
 
 use crate::synths::{SawtoothSynth, Synth};
@@ -47,7 +49,11 @@ impl AudioCallback {
 
 
 fn main() {
-    let host = cpal::default_host();
+    let sp: ScriptParser = ScriptParser::new(".".to_string());
+    sp.print_files();
+    sp.parse_files();
+
+    /*let host = cpal::default_host();
 
     let device = host.default_output_device().expect("No output device available");
     let config = device.default_output_config().unwrap().config();
@@ -89,5 +95,5 @@ fn main() {
 
     sleep(Duration::from_secs(10));
 
-    out_stream.pause().expect("Failed to pause stream");
+    out_stream.pause().expect("Failed to pause stream");*/
 }
