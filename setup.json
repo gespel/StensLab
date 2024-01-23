@@ -1,11 +1,11 @@
 {
   "synths": [
     {
-      "synthType": "Sine",
+      "synth_type": "Sine",
       "frequency": 440.0
     },
     {
-      "synthType": "Sawtooth",
+      "synth_type": "Sawtooth",
       "frequency": 220.0
     }
   ]

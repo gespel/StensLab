@@ -4,8 +4,8 @@ use serde_json::Value;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-struct JsonSynth {
-    synthType: String,
+struct JsonSynthEntry {
+    synth_type: String,
     frequency: f32
 }
 
@@ -48,8 +48,8 @@ impl ScriptParser {
             let ds: Value = serde_json::from_str(fs::read_to_string(setup_path).unwrap().as_str()).expect("Error while reading setup.json");
             println!("setup.json loaded!");
             for synth in ds["synths"].as_array().unwrap() {
-                let s: JsonSynth = serde_json::from_str(synth.to_string().as_str()).unwrap();
-                println!("{}", s.synthType);
+                let s: JsonSynthEntry = serde_json::from_str(synth.to_string().as_str()).unwrap();
+                println!("{}", s.synth_type);
                 println!("{}", s.frequency);
             }
         }
