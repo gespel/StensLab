@@ -39,6 +39,7 @@ impl ScriptParser {
 
     pub fn parse_files(&self) {
         self.parse_setup_json();
+        self.parse_script_files();
     }
 
     pub fn parse_setup_json(&self) {
@@ -56,5 +57,20 @@ impl ScriptParser {
         else {
             println!("setup.json not found!");
         }
+    }
+
+    pub fn parse_script_files(&self) {
+        for f in &self.files {
+            let file = Path::new(f);
+            //let extension = file.extension().unwrap();
+            //let t = fs::read_to_string(file).unwrap();
+
+            if let Some(extension) = file.extension() {
+                if extension.to_str().unwrap() == "gs" {
+                    println!("GScript file found!");
+                }
+            }
+        }
+
     }
 }
