@@ -68,9 +68,16 @@ impl ScriptParser {
             if let Some(extension) = file.extension() {
                 if extension.to_str().unwrap() == "gs" {
                     println!("GScript file found!");
+                    let content = fs::read_to_string(file);
+                    for line in content.unwrap().split("\n") {
+                        println!("{line}");
+                    }
                 }
             }
         }
+
+    }
+    fn parse_gscript_line(&self, line: String) {
 
     }
 }
