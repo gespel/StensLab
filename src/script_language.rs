@@ -6,17 +6,28 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 struct JsonSynthEntry {
     synth_type: String,
-    frequency: f32
+    frequency: f32,
+    name: String
+}
+
+struct SynthAction {
+    frequency: f32,
+    name: String,
+    start_time: usize,
+    end_time: usize
+
 }
 
 pub struct ScriptParser {
     path: String,
     files: Vec<String>,
+    actions: Vec<SynthAction>
 }
 
 impl ScriptParser {
     pub fn new(path: String) -> ScriptParser {
         let mut files: Vec<String> = Vec::new();
+        let mut actions: Vec<SynthAction> = Vec::new();
         let paths = fs::read_dir(&path).unwrap();
         for p in paths {
             let s = p.unwrap().path().to_str().unwrap().to_string();
@@ -28,6 +39,7 @@ impl ScriptParser {
         ScriptParser {
             path,
             files,
+            actions
         }
     }
 
@@ -78,6 +90,7 @@ impl ScriptParser {
 
     }
     fn parse_gscript_line(&self, line: String) {
-
+        let splitted = line.split(";");
+        println!("{:?}", splitted);
     }
 }
