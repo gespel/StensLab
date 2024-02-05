@@ -22,7 +22,7 @@ impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
             sine: SawtoothSynth::new(sample_rate),
-            pulse: PulseSynth::new(220f32, 0.0f32, 0.4f32, sample_rate)
+            pulse: PulseSynth::new(55f32, 0.0f32, 0.6f32, sample_rate)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
