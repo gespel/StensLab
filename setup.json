@@ -2,11 +2,13 @@
   "synths": [
     {
       "synth_type": "Sine",
-      "frequency": 440.0
+      "frequency": 440.0,
+      "name": "Eins"
     },
     {
       "synth_type": "Sawtooth",
-      "frequency": 220.0
+      "frequency": 220.0,
+      "name": "Zwei"
     }
   ]
 }

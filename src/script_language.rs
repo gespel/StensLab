@@ -90,7 +90,10 @@ impl ScriptParser {
 
     }
     fn parse_gscript_line(&self, line: String) {
-        let splitted = line.split(";");
-        println!("{:?}", splitted);
+        let splitted: Vec<&str> = line.split(";").collect();
+        let name = splitted[0].to_string();
+        let freq = splitted[1].to_string();
+        let start = splitted[2].to_string();
+        let end = splitted[3].to_string();
     }
 }

@@ -1,4 +1,4 @@
-
+use cpal::SampleRate;
 
 pub trait Synth {
     fn get_sample(&mut self) -> f32;
@@ -98,5 +98,54 @@ impl SawtoothSynth {
             sample_rate,
             freq: 440.0_f32,
         }
+    }
+}
+
+pub struct PulseSynth {
+    phase: usize,
+    pulse_pos: f32,
+    pulse_size: f32,
+    freq: f32,
+    sample_rate: usize,
+    samples_per_phase: usize,
+    pulse_start: usize,
+    pulse_end: usize
+}
+
+impl Synth for PulseSynth {
+    fn get_sample(&mut self) -> f32 {
+        self.phase += 1;
+        if self.phase >= self.samples_per_phase {
+            self.phase = 0;
+        }
+        if self.phase >= self.pulse_start && self.phase < self.pulse_end {
+            return 1 as f32;
+        }
+        else {
+            return 0 as f32;
+        }
+
+    }
+
+    fn set_frequency(&mut self, freq: f32) {
+        self.freq = freq;
+    }
+}
+
+impl PulseSynth {
+    pub fn new(freq: f32, pulse_pos: f32, pulse_size: f32, sample_rate: usize) -> PulseSynth {
+        PulseSynth {
+            phase: 0,
+            pulse_pos,
+            pulse_size,
+            freq,
+            sample_rate,
+            samples_per_phase: sample_rate/freq as usize,
+            pulse_start: (pulse_pos * sample_rate as f32/freq) as usize,
+            pulse_end: ((pulse_pos * sample_rate as f32/freq) + (pulse_size * sample_rate as f32/freq)) as usize,
+        }
+    }
+    pub fn print_info(&self) {
+        println!("samples per phase {}\npulse start {}\npulse end {}\n", self.samples_per_phase, self.pulse_start, self.pulse_end);
     }
 }
