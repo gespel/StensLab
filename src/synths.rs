@@ -148,4 +148,9 @@ impl PulseSynth {
     pub fn print_info(&self) {
         println!("samples per phase {}\npulse start {}\npulse end {}\n", self.samples_per_phase, self.pulse_start, self.pulse_end);
     }
+
+    pub fn set_pulse_size(&mut self, size: f32) {
+        self.pulse_size = size;
+        self.pulse_end = ((self.pulse_pos * self.sample_rate as f32/self.freq) + (self.pulse_size * self.sample_rate as f32/self.freq)) as usize;
+    }
 }

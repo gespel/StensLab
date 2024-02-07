@@ -16,20 +16,27 @@ use crate::synths::{PulseSynth, SawtoothSynth, Synth};
 
 struct AudioCallback {
     sine: SawtoothSynth,
-    pulse: PulseSynth
+    pulse: PulseSynth,
+    sine2: SawtoothSynth,
+    pulse2: PulseSynth
 }
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
             sine: SawtoothSynth::new(sample_rate),
-            pulse: PulseSynth::new(55f32, 0.0f32, 0.6f32, sample_rate)
+            pulse: PulseSynth::new(40.8f32, 0.0f32, 0.6f32, sample_rate),
+            pulse2: PulseSynth::new(41.2f32, 0.0f32, 0.6f32, sample_rate),
+            sine2: SawtoothSynth::new(sample_rate)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let _rng = rand::thread_rng();
-        self.sine.set_frequency(440_f32);
+        self.sine.set_frequency(0.5_f32);
+        self.sine2.set_frequency(1f32);
         for sample in data.chunks_mut(2) {
-            let s = self.pulse.get_sample();
+            let s = (self.pulse.get_sample() + self.pulse2.get_sample())/2.0;
+            self.pulse.set_pulse_size(self.sine.get_sample().abs()+0.1);
+            self.pulse2.set_pulse_size(self.sine2.get_sample().abs()+0.1);
             //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
             let x: [f32; 2] = [s, s];
             //let x: [f32, 2] = []
@@ -97,7 +104,7 @@ fn main() {
 
     out_stream.play().expect("Failed to play stream");
 
-    sleep(Duration::from_secs(3));
+    sleep(Duration::from_secs(1000));
 
     out_stream.pause().expect("Failed to pause stream");
 }
