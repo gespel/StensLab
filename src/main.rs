@@ -1,6 +1,7 @@
 mod synths;
 mod rack;
 mod script_language;
+mod instruments;
 
 extern crate cpal;
 extern crate num_complex;
@@ -9,34 +10,26 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
 use cpal::{InputCallbackInfo, OutputCallbackInfo};
+use crate::instruments::GPulsePad;
 use crate::script_language::ScriptParser;
 
 
 use crate::synths::{PulseSynth, SawtoothSynth, Synth};
 
 struct AudioCallback {
-    sine: SawtoothSynth,
-    pulse: PulseSynth,
-    sine2: SawtoothSynth,
-    pulse2: PulseSynth
+    pad: GPulsePad
 }
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            sine: SawtoothSynth::new(sample_rate),
-            pulse: PulseSynth::new(40.8f32, 0.0f32, 0.6f32, sample_rate),
-            pulse2: PulseSynth::new(41.2f32, 0.0f32, 0.6f32, sample_rate),
-            sine2: SawtoothSynth::new(sample_rate)
+            pad: GPulsePad::new(sample_rate)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let _rng = rand::thread_rng();
-        self.sine.set_frequency(0.5_f32);
-        self.sine2.set_frequency(1f32);
+
         for sample in data.chunks_mut(2) {
-            let s = (self.pulse.get_sample() + self.pulse2.get_sample())/2.0;
-            self.pulse.set_pulse_size(self.sine.get_sample().abs()+0.1);
-            self.pulse2.set_pulse_size(self.sine2.get_sample().abs()+0.1);
+            let s = self.pad.get_sample();
             //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
             let x: [f32; 2] = [s, s];
             //let x: [f32, 2] = []
