@@ -19,4 +19,10 @@ impl GPulsePad {
         let mut s = self.p1.get_sample() + self.p2.get_sample() + self.p3.get_sample();
         s / 3f32
     }
+
+    pub fn set_frequency(&mut self, freq: f32) {
+        self.p1.set_frequency(freq-0.4f32);
+        self.p2.set_frequency((freq/2f32) + 0.4f32);
+        self.p3.set_frequency(freq/3f32);
+    }
 }
