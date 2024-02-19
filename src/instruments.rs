@@ -24,5 +24,6 @@ impl GPulsePad {
         self.p1.set_frequency(freq-0.4f32);
         self.p2.set_frequency((freq/2f32) + 0.4f32);
         self.p3.set_frequency(freq/3f32);
+        //a
     }
 }
