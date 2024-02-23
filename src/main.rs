@@ -14,21 +14,27 @@ use crate::instruments::{GPulsePad, MegaDrone};
 use crate::synths::{PulseSynth, SawtoothSynth, Synth};
 
 struct AudioCallback {
-    drone: MegaDrone
+    drone: MegaDrone,
+    drone2: MegaDrone,
+    drone3: MegaDrone
 }
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            drone: MegaDrone::new(sample_rate, 110f32, 10)
+            drone: MegaDrone::new(sample_rate, 110f32, 100),
+            drone2: MegaDrone::new(sample_rate, 55f32, 100),
+            drone3: MegaDrone::new(sample_rate, 220f32, 100)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let _rng = rand::thread_rng();
 
         for sample in data.chunks_mut(2) {
-            let s = self.drone.get_sample();
+            let base = self.drone2.get_sample();
+            let s = (self.drone.get_sample() + base) / 2f32;
+            let s2= (self.drone3.get_sample() + base) / 2f32;
             //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
-            let x: [f32; 2] = [s, s];
+            let x: [f32; 2] = [s, s2];
             //let x: [f32, 2] = []
             sample.copy_from_slice(&x);
         }
