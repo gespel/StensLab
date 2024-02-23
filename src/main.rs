@@ -1,6 +1,5 @@
 mod synths;
 mod rack;
-mod script_language;
 mod instruments;
 
 extern crate cpal;
@@ -10,26 +9,24 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::thread::sleep;
 use std::time::Duration;
 use cpal::{InputCallbackInfo, OutputCallbackInfo};
-use crate::instruments::GPulsePad;
-use crate::script_language::ScriptParser;
-
+use crate::instruments::{GPulsePad, MegaDrone};
 
 use crate::synths::{PulseSynth, SawtoothSynth, Synth};
 
 struct AudioCallback {
-    pad: GPulsePad
+    drone: MegaDrone
 }
 impl AudioCallback {
     fn new(sample_rate: usize) -> AudioCallback {
         AudioCallback {
-            pad: GPulsePad::new(sample_rate)
+            drone: MegaDrone::new(sample_rate, 110f32, 10)
         }
     }
     fn out_audio_callback(&mut self, data: &mut [f32], _: &cpal::OutputCallbackInfo) {
         let _rng = rand::thread_rng();
 
         for sample in data.chunks_mut(2) {
-            let s = self.pad.get_sample();
+            let s = self.drone.get_sample();
             //let x: [f32; 2] = [rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)];
             let x: [f32; 2] = [s, s];
             //let x: [f32, 2] = []
@@ -51,9 +48,6 @@ impl AudioCallback {
 
 
 fn main() {
-    let sp: ScriptParser = ScriptParser::new(".".to_string());
-    sp.print_files();
-    sp.parse_files();
 
     let p = PulseSynth::new(440f32, 0.3f32, 0.2f32, 48000);
     p.print_info();
